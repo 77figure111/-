@@ -1,0 +1,41 @@
+
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: ecom-agent-api
+    env_file:
+      - .env
+    environment:
+      CHROMA_DIR: /app/chroma_db
+      MD5_FILE: /app/md5.txt
+      PYTHONPATH: /app
+    ports:
+      - "8001:8001"
+    #数据持久化，
+    volumes:
+      - ./data:/app/data
+      - ./chroma_db:/app/chroma_db
+      - ./chat_history:/app/chat_history
+    #自动重启策略：除非手动停止，否则崩溃、开机、重启都会自动运行
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: ecom-agent-frontend
+    env_file:
+      - .env
+    environment:
+      API_URL: http://api:8001/chat
+      INGEST_URL: http://api:8001/ingest/file
+      PYTHONPATH: /app
+    #必须等后端 api 启动后，前端才启动
+    depends_on:
+      - api
+    ports:
+      - "8501:8501"
+    restart: unless-stopped
