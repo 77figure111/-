@@ -31,6 +31,7 @@ from app.services.agent_tools import (
     query_logistics_status,
     query_refund_status,
 )
+#调用 file_history_store 的 get_history 函数，实现「会话消息持久化」和「上下文加载」
 from app.services.file_history_store import get_history
 
 logger = logging.getLogger(__name__)
@@ -72,7 +73,8 @@ class AgentService:
             model="gpt-5-mini",
             temperature=0
         )
-
+        #内存存储（重启服务就丢）
+        #file_history_store.py 文件持久化存储（重启不丢）永久保存到 JSON 文件里。
         self.checkpointer = InMemorySaver()
 
         self.agent = create_agent(
@@ -95,7 +97,7 @@ class AgentService:
         if len(text) <= limit:
             return text
         return text[:limit] + "..."
-
+    #保存用户消息（_save_user_message 方法）
     def _save_user_message(self, thread_id: str, user_input: str) -> None:
         try:
             history = get_history(thread_id)
@@ -107,7 +109,7 @@ class AgentService:
                 thread_id,
                 str(e),
             )
-
+    #3. 保存 AI 回复消息（_save_ai_message 方法）
     def _save_ai_message(self, thread_id: str, answer_text: str) -> None:
         try:
             history = get_history(thread_id)

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 router=APIRouter(prefix='/chat',tags=['chat'])
 agent_service=AgentService()
-
+#把一段长文本变成不超过指定长度的短文本，超长就截断 + 加省略号 ...
 def _short_text(text: str, limit: int = 60) -> str:
     text = text.replace("\n", " ").strip()
     if len(text) <= limit:

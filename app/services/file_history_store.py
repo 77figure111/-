@@ -1,3 +1,20 @@
+#存储会话历史消息存储会话历史消息
+"""
+#1.初始化：接收 session_id
+（对应 agent_service 中的 thread_id）和存储路径，
+生成每个会话独立的 JSON 文件
+（路径：./chat_history/{session_id}.json）。
+
+#2.add_messages将新消息（用户 / AI 消息）追加到历史消息列表，序列化后写入 JSON 文件（覆盖式写入，保证历史完整）。
+
+#3.messages 属性：从 JSON 文件中读取历史消息，反序列化为 LangChain 的 BaseMessage 对象列表（兼容 LangChain 生态）。
+
+#4.clear：清空指定会话的历史消息文件
+
+#5.工具函数：get_history
+封装 FileChatMessageHistory 的实例化逻辑，
+固定存储路径为 ./chat_history，对外提供「根据 session_id 获取会话历史对象」的统一入口。
+"""
 import json
 import logging
 import os

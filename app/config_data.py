@@ -1,11 +1,18 @@
+import os
 from pathlib import Path
 
-
-md5_path= "../md5.txt"
+#路径不写死
+#md5_path= "../md5.txt"
+#数据处理路径
+#__file__当前文件自己的路径 services/config_data.py
+#.resolve()把路径变成 绝对路径 + 标准化路径，清理乱七八糟的路径符号（比如 . .. 冗余斜杠等）
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+#去 .env 或系统环境变量 里找名叫 MD5_FILE 的值
+md5_path=os.getenv("MD5_FILE",str(PROJECT_ROOT/"md5.txt"))
 
 #向量存储的实例Chroma向量库对象
 collection_name="rag_knowledge_base"
-persist_direction="./chroma_db"
+persist_direction=os.getenv("CHROMA_DIR", str(PROJECT_ROOT / "chroma_db"))
 #分割器
 chunk_size=1000
 chunk_overlap=100
@@ -27,7 +34,7 @@ def build_session_config(session_id:str):
 }
 #数据处理路径
 BASE_DIR=Path(__file__).parent
-PROJECT_ROOT = BASE_DIR
+
 SAVE_DIR=PROJECT_ROOT/"data"/"raw"/"chinese_ecomqa"
 
 #RunnableConfig = {"configurable": {"thread_id": "1"}}

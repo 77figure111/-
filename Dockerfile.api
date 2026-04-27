@@ -1,0 +1,29 @@
+FROM PYTHON:3.11-slim
+
+WORKDIR/app
+#不生成 .pyc 缓存文件，避免冗余
+ENV PYTHONDONTTWRITEBYTECODE=1
+#日志实时输出，方便看日志
+ENV PYTHONUNBUFFERED=1
+#pip 不缓存安装包，减小镜像体积。
+ENV PIP_NO_CACHE_DIR=1
+#让 Python 能识别 /app 下的所有模块（解决导入报错）
+ENV PYTHONPATH=/app
+
+
+#把本地的 requirements.txt 复制到容器里
+COPY requirements.txt /app/requirements.txt
+
+#--no-cache-dir 再次确保不缓存，镜像更小
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+#项目代码和数据文件复制进容器
+COPY app /app/app
+COPY data /app/data
+#创建两个文件夹，用于：chroma_db：向量数据库存储目录,chat_history：聊天记录存储目录,-p 表示不存在就自动创建，不报错。
+RUN mkdir -p /app/chroma_db /app/chat_history
+
+
+#声明容器会暴露 8001 端口，供外部访问 API
+EXPOSE 8001
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]

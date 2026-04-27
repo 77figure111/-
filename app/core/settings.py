@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     app_name:str="ecom-agent-api"
     #版本号
     app_version :str = "0.1.0"
+    host: str = "0.0.0.0"
+    port: int = 8001
     #开启调试模式，一般用在 Web 项目（比如 FastAPI、Flask、Django）里
     """
     开启后会有这些效果：
@@ -14,7 +16,12 @@ class Settings(BaseSettings):
          开发阶段用，上线时必须改成 False
     """
     debug:bool=True
-    class config:
-        env_file=".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+    # class config:
+    #     env_file=".env"
 settings=Settings()
 
